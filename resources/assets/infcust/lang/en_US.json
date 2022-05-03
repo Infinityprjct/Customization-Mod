@@ -1,0 +1,14 @@
+{
+  "key.categories.infcust": "Infinity",
+  "infcust.gui": "Customization menu",
+  "infcust.hats": "Hats",
+  "infcust.weapon": "Weapon",
+  "infcust.armor": "Armor",
+  "infcust.back": "Back",
+  "infcust.testwidget": "test widget",
+  "infcust.guiMainHeader": "Customization",
+  "infcust.guiMainHeader": "Customization",
+  "infcust.guiHatsHeader": "Hats",
+  "infcust.guiWeaponHeader": "Weapon",
+  "infcust.guiArmorHeader": "Armor"
+}
