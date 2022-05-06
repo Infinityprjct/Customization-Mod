@@ -2,6 +2,7 @@ package com.feedoktv.infcust;
 
 import com.feedoktv.infcust.client.handlers.EventHandlerClient;
 import com.feedoktv.infcust.common.core.capabilities.CapabilityUtil;
+import com.feedoktv.infcust.common.core.networking.PacketDispatcher;
 import com.feedoktv.infcust.common.handlers.CapabilityRegistry;
 import com.feedoktv.infcust.common.handlers.EventHandlerServer;
 import com.feedoktv.infcust.common.handlers.ItemsHandler;
@@ -71,12 +72,11 @@ public class InfCust {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        NetworkHandler.init();
+        PacketDispatcher.register();
         CapabilityRegistry.init();
         capabilityUtil = new CapabilityUtil();
 
         LOGGER.info("[INFCUST] SETUP EVENT INIT");
-
 
     }
 
