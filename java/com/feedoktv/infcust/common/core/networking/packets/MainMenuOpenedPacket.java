@@ -39,18 +39,7 @@ public class MainMenuOpenedPacket extends AbstractMessage<MainMenuOpenedPacket>
         handleServerSide(message, ctx, Objects.requireNonNull(player));
     }
 
-    private static void handleClientSide(final MainMenuOpenedPacket message, final Supplier<NetworkEvent.Context> ctx)
-    {
-        ctx.get().enqueueWork(()->{
-            if ("infcust.gui".equalsIgnoreCase(message.keyBindingDesc))
-            {
-                InfCust.eventHandlerClient.OpenCustMenu();
-                InfCust.LOGGER.error("BLYADSTVO");
-            }
 
-        });
-        ctx.get().setPacketHandled(true);
-    }
 
     private static void handleServerSide(final MainMenuOpenedPacket message, final Supplier<NetworkEvent.Context> ctx, final ServerPlayerEntity player)
     {

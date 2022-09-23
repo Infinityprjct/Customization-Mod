@@ -4,6 +4,7 @@ import com.feedoktv.infcust.InfCust;
 import com.feedoktv.infcust.client.gui.CustomizationScreen;
 import com.feedoktv.infcust.client.layers.ItemsLayer;
 import com.feedoktv.infcust.common.core.networking.PacketDispatcher;
+import com.feedoktv.infcust.common.core.networking.packets.CapabilityUpdateServerPacket;
 import com.feedoktv.infcust.common.core.networking.packets.MainMenuOpenedPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -23,9 +24,10 @@ public class EventHandlerClient {
     public void clientTick(TickEvent.ClientTickEvent e) {
         if(InfCust.keyBinding.isDown()) {
             PacketDispatcher.sendToServer(new MainMenuOpenedPacket("infcust.gui"));
+            PacketDispatcher.sendToServer(new CapabilityUpdateServerPacket(0, Minecraft.getInstance().player.getId()));
             //Minecraft.getInstance().setScreen(new CustomizationScreen());
-            int id = InfCust.capabilityUtil.getCapabilityHatId();
-            InfCust.LOGGER.error("capa " + id);
+            //int id = InfCust.capabilityUtil.getCapabilityHatId();
+            //InfCust.LOGGER.error("capa " + id);
         }
     }
 
@@ -78,6 +80,7 @@ public class EventHandlerClient {
 
     public void OpenCustMenu() {
         Minecraft.getInstance().setScreen(new CustomizationScreen());
+
     }
 
 }

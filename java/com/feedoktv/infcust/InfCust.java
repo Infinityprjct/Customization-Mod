@@ -3,10 +3,7 @@ package com.feedoktv.infcust;
 import com.feedoktv.infcust.client.handlers.EventHandlerClient;
 import com.feedoktv.infcust.common.core.capabilities.CapabilityUtil;
 import com.feedoktv.infcust.common.core.networking.PacketDispatcher;
-import com.feedoktv.infcust.common.handlers.CapabilityRegistry;
-import com.feedoktv.infcust.common.handlers.EventHandlerServer;
-import com.feedoktv.infcust.common.handlers.ItemsHandler;
-import com.feedoktv.infcust.common.handlers.NetworkHandler;
+import com.feedoktv.infcust.common.handlers.*;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraftforge.api.distmarker.Dist;
@@ -41,8 +38,6 @@ public class InfCust {
     public static ItemsHandler itemsHandler;
     public static CapabilityUtil capabilityUtil;
 
-
-
     public static KeyBinding keyBinding;
 
     public InfCust() {
@@ -55,11 +50,12 @@ public class InfCust {
 
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
 
+        ItemRegistry.register(eventBus);
+
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
 
             eventBus.addListener(this::doClientStuff);
 
-            itemsHandler.register(eventBus);
             MinecraftForge.EVENT_BUS.register(eventHandlerClient = new EventHandlerClient());
 
             itemsHandler = new ItemsHandler();
@@ -72,9 +68,9 @@ public class InfCust {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        PacketDispatcher.register();
         CapabilityRegistry.init();
         capabilityUtil = new CapabilityUtil();
+        PacketDispatcher.register();
 
         LOGGER.info("[INFCUST] SETUP EVENT INIT");
 

@@ -2,7 +2,6 @@ package com.feedoktv.infcust.client.layers;
 
 import com.feedoktv.infcust.InfCust;
 import com.feedoktv.infcust.common.items.CustItem;
-import com.feedoktv.infcust.common.models.test_armorhatmodel;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -10,7 +9,6 @@ import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.ElytraModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
@@ -22,7 +20,6 @@ import net.minecraft.util.math.vector.Vector3f;
 
 public class ItemsLayer <T extends LivingEntity, M extends EntityModel<T>> extends LayerRenderer<T, M> {
 
-    private final ElytraModel<T> elytraModel = new ElytraModel<>();
     private static final ResourceLocation WINGS_LOCATION = new ResourceLocation("infcust:textures/models/armor/test_hatmodel.png");
 
     //test_armorhatmodel hh = new test_armorhatmodel();
@@ -49,6 +46,7 @@ public class ItemsLayer <T extends LivingEntity, M extends EntityModel<T>> exten
             item = InfCust.itemsHandler.getItemByIndex(itemId);
         }
 
+        
 
         ItemStack itemstack = p_225628_4_.getItemBySlot(EquipmentSlotType.HEAD);
 

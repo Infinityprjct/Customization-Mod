@@ -1,5 +1,6 @@
 package com.feedoktv.infcust.common.core.capabilities.hatsCapability;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -15,6 +16,11 @@ public class HatCapabilityProvider implements ICapabilitySerializable<INBT> {
 
     private final HatCapabilityData playerHatCapability = new HatCapabilityData();
     private final Capability.IStorage<HatCapabilityData> hatCapabilityStorage = PLAYER_HAT_ID.getStorage();
+
+    public static LazyOptional<HatCapabilityData> getLivingEntityModCap(final LivingEntity entity)
+    {
+        return entity.getCapability(PLAYER_HAT_ID);
+    }
 
     @Nonnull
     @Override

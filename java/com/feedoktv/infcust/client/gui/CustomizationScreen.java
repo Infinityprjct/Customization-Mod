@@ -3,7 +3,8 @@ package com.feedoktv.infcust.client.gui;
 import com.feedoktv.infcust.InfCust;
 import com.feedoktv.infcust.client.gui.Widgets.CustButton;
 import com.feedoktv.infcust.client.gui.Widgets.ItemWidget;
-import com.feedoktv.infcust.common.core.capabilities.hatsCapability.HatCapability;
+import com.feedoktv.infcust.common.core.networking.PacketDispatcher;
+import com.feedoktv.infcust.common.core.networking.packets.CapabilityUpdateServerPacket;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -62,7 +63,8 @@ public class CustomizationScreen extends Screen  {
 
         backButton = new CustButton(leftPos +115, topPos+150 , (this.width/this.height)*130, 20, new TranslationTextComponent("infcust.back"), (p_213030_1_) -> {
             this.showMainButtons();
-            InfCust.capabilityUtil.updateCapabilityHatId(-1);
+            //InfCust.capabilityUtil.updateCapabilityHatId(-1);
+            PacketDispatcher.sendToServer(new CapabilityUpdateServerPacket(-1, Minecraft.getInstance().player.getId()));
         });
         this.addButton(backButton);
 

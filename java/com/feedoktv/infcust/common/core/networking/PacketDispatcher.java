@@ -1,8 +1,7 @@
 package com.feedoktv.infcust.common.core.networking;
 
 import com.feedoktv.infcust.InfCust;
-import com.feedoktv.infcust.common.core.networking.packets.MainMenuOpenedPacket;
-import com.feedoktv.infcust.common.core.networking.packets.OpenMainMenuPacket;
+import com.feedoktv.infcust.common.core.networking.packets.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.RegistryKey;
@@ -28,10 +27,16 @@ public class PacketDispatcher
                 .networkProtocolVersion(() -> NETWORK_VERSION)
                 .simpleChannel();
 
-        // Bidirectional
+        // To Server Packets
         registerMessage(MainMenuOpenedPacket.class, new MainMenuOpenedPacket());
+
+        // To Client packets
         registerMessage(OpenMainMenuPacket.class, new OpenMainMenuPacket());
 
+        // Bisexual packets
+        registerMessage(TestPacket.class, new TestPacket());
+        registerMessage(CapabilityUpdateServerPacket.class, new CapabilityUpdateServerPacket());
+        registerMessage(CapabilityUpdateClientPacket.class, new CapabilityUpdateClientPacket());
     }
 
     private static <MSG extends AbstractMessage<MSG>> void registerMessage(Class<MSG> messageType, AbstractMessage<MSG> message)

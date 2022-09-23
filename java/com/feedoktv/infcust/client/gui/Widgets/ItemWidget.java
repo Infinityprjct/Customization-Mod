@@ -1,36 +1,21 @@
 package com.feedoktv.infcust.client.gui.Widgets;
 
-import com.feedoktv.infcust.InfCust;
 import com.feedoktv.infcust.client.gui.GuiMenuEnum;
-import com.feedoktv.infcust.client.renderers.CustItemRenderer;
-import com.feedoktv.infcust.common.handlers.ItemsHandler;
+import com.feedoktv.infcust.common.handlers.ItemRegistry;
 import com.feedoktv.infcust.common.items.CustItem;
-import com.feedoktv.infcust.common.items.test_hatitem;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import java.awt.*;
-import java.util.Objects;
 
 public class ItemWidget extends Button {
 
@@ -65,7 +50,7 @@ public class ItemWidget extends Button {
             this.renderBg(p_230430_1_, minecraft, p_230430_2_, p_230430_3_);
             int j = 16777215;
             //drawCenteredString(p_230430_1_, fontrenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
-            Minecraft.getInstance().getItemRenderer().renderGuiItem(new ItemStack(ItemsHandler.test_hatitem.get()), this.x + 20, this.y + 20);
+            Minecraft.getInstance().getItemRenderer().renderGuiItem(new ItemStack(ItemRegistry.test_hatitem.get()), this.x + 20, this.y + 20);
             if (this.visible) {
                 this.isHovered = p_230430_2_ >= this.x && p_230430_3_ >= this.y && p_230430_2_ < this.x + this.width && p_230430_3_ < this.y + this.height;
                 if (this.wasHovered != this.isHovered()) {
