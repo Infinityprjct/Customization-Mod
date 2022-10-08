@@ -14,10 +14,10 @@ public class ItemRegistry {
 
     public static final RegistryObject<Item> test_hatitem = ITEMS.register("test_hatmodel",
             () -> new Item(new Item.Properties().tab(ItemGroup.TAB_MISC)));
-
-    //public static final RegistryObject<com.feedoktv.infcust.common.items.test_hatitem> test_hatitem = ITEMS.register("test_hatmodel",
-    //        () -> new test_hatitem());
-
+    public static final RegistryObject<Item> test_glassesitem = ITEMS.register("test_glasses",
+            () -> new Item(new Item.Properties().tab(ItemGroup.TAB_MISC)));
+    public static final RegistryObject<Item> test_huy = ITEMS.register("test_huy",
+            () -> new Item(new Item.Properties().tab(ItemGroup.TAB_MISC)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

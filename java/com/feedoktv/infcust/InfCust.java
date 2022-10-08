@@ -38,7 +38,7 @@ public class InfCust {
     public static ItemsHandler itemsHandler;
     public static CapabilityUtil capabilityUtil;
 
-    public static KeyBinding keyBinding;
+    public static KeyBinding menuKeyBinding;
 
     public InfCust() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -53,16 +53,10 @@ public class InfCust {
         ItemRegistry.register(eventBus);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-
             eventBus.addListener(this::doClientStuff);
-
             MinecraftForge.EVENT_BUS.register(eventHandlerClient = new EventHandlerClient());
-
             itemsHandler = new ItemsHandler();
-
         });
-
-
 
         LOGGER.info("Infinity Customization class initialized");
     }
@@ -73,23 +67,22 @@ public class InfCust {
         PacketDispatcher.register();
 
         LOGGER.info("[INFCUST] SETUP EVENT INIT");
-
     }
 
     @OnlyIn(Dist.CLIENT)
     private void doClientStuff(final FMLClientSetupEvent event) {
         itemsHandler.initItems();
         eventHandlerClient.initLayers();
-        NetworkHandler.init();
+        //NetworkHandler.init();
 
-        keyBinding = new KeyBinding("infcust.gui", KeyConflictContext.UNIVERSAL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.categories.infcust");
-        ClientRegistry.registerKeyBinding(keyBinding);
+        menuKeyBinding = new KeyBinding("infcust.gui", KeyConflictContext.UNIVERSAL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.categories.infcust");
+        ClientRegistry.registerKeyBinding(menuKeyBinding);
+
         LOGGER.info("[INFCUST] SETUP EVENT INIT");
     }
 
     private void finishLoading(FMLLoadCompleteEvent event) {
         LOGGER.info("[INFCUST] COMPLETE EVENT INIT");
-
     }
 
 }

@@ -22,12 +22,9 @@ import java.util.Map;
 public class EventHandlerClient {
     @SubscribeEvent
     public void clientTick(TickEvent.ClientTickEvent e) {
-        if(InfCust.keyBinding.isDown()) {
+        if(InfCust.menuKeyBinding.isDown()) {
             PacketDispatcher.sendToServer(new MainMenuOpenedPacket("infcust.gui"));
             PacketDispatcher.sendToServer(new CapabilityUpdateServerPacket(0, Minecraft.getInstance().player.getId()));
-            //Minecraft.getInstance().setScreen(new CustomizationScreen());
-            //int id = InfCust.capabilityUtil.getCapabilityHatId();
-            //InfCust.LOGGER.error("capa " + id);
         }
     }
 
@@ -54,6 +51,7 @@ public class EventHandlerClient {
 
         //Add our sneaky sneaky layers
         PlayerRenderer rend = Minecraft.getInstance().getEntityRenderDispatcher().getSkinMap().get("default");
+
         ItemsLayer layerHat = new ItemsLayer(rend);
 
         HashSet<LivingRenderer> addedRenderers = new HashSet<>();
@@ -69,18 +67,15 @@ public class EventHandlerClient {
             if (addedRenderers.contains(entityRenderer)) {
                 return;
             }
-
             if (entityRenderer instanceof PlayerRenderer) {
                 LivingRenderer renderer = (LivingRenderer) entityRenderer;
                 renderer.addLayer(layerHat);
             }
-
         });
     }
 
     public void OpenCustMenu() {
         Minecraft.getInstance().setScreen(new CustomizationScreen());
-
     }
 
 }

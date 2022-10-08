@@ -7,7 +7,7 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.util.ResourceLocation;
 
 public abstract class ItemBaseModel extends BipedModel<LivingEntity> {
-    protected final ModelRenderer armorHead;
+    protected final ModelRenderer headModel;
     protected final ModelRenderer armorBody;
     protected final ModelRenderer armorRightArm;
     protected final ModelRenderer armorLeftArm;
@@ -24,10 +24,10 @@ public abstract class ItemBaseModel extends BipedModel<LivingEntity> {
         this.texHeight = textureHeight;
         this.texture = texture.toString();
 
-        armorHead = new ModelRenderer(this);
-        armorHead.setPos(0.0F, 0.0F, 0.0F);
+        headModel = new ModelRenderer(this);
+        headModel.setPos(0.0F, 0.0F, 0.0F);
         head.texOffs(0,0);
-        head.addChild(armorHead);
+        head.addChild(headModel);
 
         armorBody = new ModelRenderer(this);
         armorBody.setPos(0.0F, 0.0F, 0.0F);
@@ -68,7 +68,7 @@ public abstract class ItemBaseModel extends BipedModel<LivingEntity> {
     }
 
     public BipedModel applySlot(EquipmentSlotType slot){
-        armorHead.visible = false;
+        headModel.visible = false;
         armorBody.visible = false;
         armorRightArm.visible = false;
         armorLeftArm.visible = false;
@@ -79,7 +79,7 @@ public abstract class ItemBaseModel extends BipedModel<LivingEntity> {
 
         switch(slot){
             case HEAD:
-                armorHead.visible = false;
+                headModel.visible = false;
 
                 break;
             case CHEST:

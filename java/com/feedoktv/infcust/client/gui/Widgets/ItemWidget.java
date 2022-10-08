@@ -3,19 +3,26 @@ package com.feedoktv.infcust.client.gui.Widgets;
 import com.feedoktv.infcust.client.gui.GuiMenuEnum;
 import com.feedoktv.infcust.common.handlers.ItemRegistry;
 import com.feedoktv.infcust.common.items.CustItem;
+import com.feedoktv.infcust.common.models.HUY_MODEL;
+import com.feedoktv.infcust.common.models.KaidoPet;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.vertex.VertexBuffer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.RegistryObject;
 
 public class ItemWidget extends Button {
 
@@ -24,15 +31,21 @@ public class ItemWidget extends Button {
     public boolean active = true;
     public GuiMenuEnum menuPlacement;
     public boolean isHovered;
+    private int itemX;
+    private int itemY;
+    private double itemScale;
     private boolean focused;
     private boolean wasHovered;
     private CustItem custItem;
     public static final ResourceLocation CUSTWIDGETS = new ResourceLocation("infcust:textures/gui/widgets.png");
 
-    public ItemWidget(int p_i232255_1_, int p_i232255_2_, int p_i232255_3_, int p_i232255_4_, ITextComponent p_i232255_5_, GuiMenuEnum _menuPlacement,CustItem _item,net.minecraft.client.gui.widget.button.Button.IPressable p_i232255_6_) {
+    public ItemWidget(int p_i232255_1_, int p_i232255_2_, int p_i232255_3_, int p_i232255_4_, ITextComponent p_i232255_5_,int ix,int iy, double is, GuiMenuEnum _menuPlacement,CustItem _item,net.minecraft.client.gui.widget.button.Button.IPressable p_i232255_6_) {
         super(p_i232255_1_, p_i232255_2_, p_i232255_3_, p_i232255_4_, p_i232255_5_, p_i232255_6_);
         this.menuPlacement =_menuPlacement;
         this.custItem = _item;
+        this.itemX = ix;
+        this.itemY = iy;
+        this.itemScale = is;
     }
 
     public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_) {
@@ -50,7 +63,12 @@ public class ItemWidget extends Button {
             this.renderBg(p_230430_1_, minecraft, p_230430_2_, p_230430_3_);
             int j = 16777215;
             //drawCenteredString(p_230430_1_, fontrenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
-            Minecraft.getInstance().getItemRenderer().renderGuiItem(new ItemStack(ItemRegistry.test_hatitem.get()), this.x + 20, this.y + 20);
+            //Minecraft.getInstance().getItemRenderer().renderGuiItem(new ItemStack(this.getMcItem()), this.x + 20, this.y + 20);
+            if (this.custItem != null) {
+                Minecraft.getInstance().getItemRenderer().renderGuiItem(new ItemStack(this.getMcItem()), this.x + this.itemX, this.y + this.itemX);
+                //        Minecraft.getInstance().getRenderManager().renderEntityStatic(new PigEntity(EntityType.PIG,field_230706_i_.world), 0.0D, 0.0D, 0.0D, 0.0f, partialticks, matrixStack, field_230706_i_.getRenderTypeBuffers().getBufferSource(), 500);
+            }
+            HUY_MODEL h = new HUY_MODEL();
             if (this.visible) {
                 this.isHovered = p_230430_2_ >= this.x && p_230430_3_ >= this.y && p_230430_2_ < this.x + this.width && p_230430_3_ < this.y + this.height;
                 if (this.wasHovered != this.isHovered()) {
@@ -161,6 +179,14 @@ public class ItemWidget extends Button {
 
     public CustItem getItem() {
         return custItem;
+    }
+    public Item getMcItem() {return custItem.getMcItem();}
+
+    public void hideWidget()
+    {
+        this.visible = false;
+        this.width = 0;
+        this.custItem = null;
     }
 
 }

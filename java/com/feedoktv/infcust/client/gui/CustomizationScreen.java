@@ -5,24 +5,28 @@ import com.feedoktv.infcust.client.gui.Widgets.CustButton;
 import com.feedoktv.infcust.client.gui.Widgets.ItemWidget;
 import com.feedoktv.infcust.common.core.networking.PacketDispatcher;
 import com.feedoktv.infcust.common.core.networking.packets.CapabilityUpdateServerPacket;
+import com.feedoktv.infcust.common.handlers.ItemRegistry;
+import com.feedoktv.infcust.common.items.CustItem;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.TranslationTextComponent;
 
-import java.util.List;
+import java.util.*;
 
 
 public class CustomizationScreen extends Screen  {
@@ -34,15 +38,19 @@ public class CustomizationScreen extends Screen  {
     private int topPos;
     private int imageWidth = 1105;
     private int imageHeight = 711;
-    TranslationTextComponent guiHeaderText = new TranslationTextComponent("infcust.guiMainHeader");;
-    FontRenderer fontRenderer = Minecraft.getInstance().font;
-    private CustButton hatsButton;
-    private CustButton weaponButton;
-    private CustButton armorButton;
-    private CustButton backButton;
-    private GuiMenuEnum currentMenuPoint = GuiMenuEnum.MAIN;
-    private int pagesCount;
+    private int pages;
     private int currentPage;
+    TranslationTextComponent guiHeaderText = new TranslationTextComponent("infcust.guiMainHeader");;
+    TranslationTextComponent currentPageText = new TranslationTextComponent("");
+    FontRenderer fontRenderer = Minecraft.getInstance().font;
+    private ItemWidget hatsButton;
+    private ItemWidget weaponButton;
+    private ItemWidget armorButton;
+    private CustButton backButton;
+    private CustButton nextPageButton;
+    private CustButton prevPageButton;
+    private GuiMenuEnum currentMenuPoint = GuiMenuEnum.MAIN;
+    private List<GUIPage> menuPointPages = Lists.newArrayList();
     private List<ItemWidget> hatsWidgets = Lists.newArrayList();
     private List<ItemWidget> WeaponWidgets = Lists.newArrayList();
     private List<ItemWidget> ArmorWidgets = Lists.newArrayList();
@@ -57,30 +65,37 @@ public class CustomizationScreen extends Screen  {
         super.init();
 
         this.leftPos = (this.width - 256) / 2;
-        this.topPos = (this.height - 195) / 2;
-
-        InfCust.LOGGER.error(currentMenuPoint);
+        this.topPos = (this.height - 192) / 2;
 
         backButton = new CustButton(leftPos +115, topPos+150 , (this.width/this.height)*130, 20, new TranslationTextComponent("infcust.back"), (p_213030_1_) -> {
             this.showMainButtons();
-            //InfCust.capabilityUtil.updateCapabilityHatId(-1);
             PacketDispatcher.sendToServer(new CapabilityUpdateServerPacket(-1, Minecraft.getInstance().player.getId()));
         });
         this.addButton(backButton);
 
         if (currentMenuPoint == GuiMenuEnum.MAIN) {
             initMainGuiScreen();
-
         }
         else {
-
             initHatsScreen();
-
         }
 
+        switch (currentMenuPoint)
+        {
+            case MAIN:
+                InfCust.LOGGER.error("[GUI] MAIN");
+                break;
+            case HATS:
+                InfCust.LOGGER.error("[GUI] HATS");
+                break;
+            case ARMOR:
+                InfCust.LOGGER.error("[GUI] ARMOR");
+                break;
+        }
+
+        this.updatePageDimensions();
 
     }
-
 
     public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_) {
 
@@ -93,12 +108,9 @@ public class CustomizationScreen extends Screen  {
 
         fontRenderer.drawShadow(p_230430_1_,guiHeaderText, leftPos +150, topPos-5, 16777215);
 
-        if (currentMenuPoint != GuiMenuEnum.MAIN & hatsWidgets.size() != 0) {
-            generateAndRenderPages(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
-        }
-
         this.xMouse = (float)p_230430_2_;
         this.yMouse = (float)p_230430_3_;
+
 
         super.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
 
@@ -146,7 +158,6 @@ public class CustomizationScreen extends Screen  {
         playerEntity.xRot = f4;
         playerEntity.yHeadRotO = f5;
         playerEntity.yHeadRot = f6;
-        //playerEntity.setItemInHand(playerEntity.getUsedItemHand(), ItemStack.EMPTY);
         RenderSystem.popMatrix();
     }
 
@@ -175,17 +186,37 @@ public class CustomizationScreen extends Screen  {
 
     }
 
+    public static <T> List<List<T>> chunkList(List<T> list, int chunkSize){
+        List<List<T>> outLists = new ArrayList<>();
+
+        for (int i = 0; i < list.size(); i += chunkSize) {
+            List<T> _l = new ArrayList<>(list.subList(i, Math.min(list.size(), i + chunkSize)));
+            outLists.add(_l);
+        }
+
+        return outLists;
+    }
+
     ////// Main GUI functions
 
     private void initMainGuiScreen() {
-        hatsButton = new CustButton(leftPos +115, topPos+20 ,(this.width/this.height)*130 , 20, new TranslationTextComponent("infcust.hats"), (p_213030_1_) -> {
-            this.initHatsScreen();});
 
-        weaponButton = new CustButton(leftPos +115, topPos+50 , (this.width/this.height)*130, 20, new TranslationTextComponent("infcust.armor"), (p_213030_1_) -> {
-            this.hideMainButtons();});
+        int playerHatId = InfCust.capabilityUtil.getClientHatId();
+        if (playerHatId == -1) {
+            playerHatId = 0;
+        }
 
-        armorButton = new CustButton(leftPos +115, topPos+80 , (this.width/this.height)*130, 20, new TranslationTextComponent("infcust.weapon"), (p_213030_1_) -> {
-            this.hideMainButtons();});
+        hatsButton = new ItemWidget(leftPos + 110, topPos + 20, 40, 40, new TranslationTextComponent("infcust.testwidget"), 11,11,1 ,GuiMenuEnum.HATS, InfCust.itemsHandler.getItemByIndex(playerHatId), (p_213030_1_) -> {
+            this.initHatsScreen();
+        });
+
+        weaponButton = new ItemWidget(leftPos + 110, topPos + 40, 40, 40, new TranslationTextComponent("infcust.testwidget"), 11,11,1 ,GuiMenuEnum.HATS, InfCust.itemsHandler.getItemByIndex(0), (p_213030_1_) -> {
+            this.initHatsScreen();
+        });
+
+        armorButton = new ItemWidget(leftPos + 110, topPos + 60, 40, 40, new TranslationTextComponent("infcust.testwidget"), 11,11,1 ,GuiMenuEnum.HATS, InfCust.itemsHandler.getItemByIndex(0), (p_213030_1_) -> {
+            this.initHatsScreen();
+        });
 
         this.addButton(hatsButton);
         this.addButton(weaponButton);
@@ -210,11 +241,10 @@ public class CustomizationScreen extends Screen  {
     }
 
     private void hideMainButtons() {
-        for (int btn = 1; btn <= 3; btn = btn+1) {
-            this.buttons.get(btn).setMessage(new TranslationTextComponent(""));
-            this.buttons.get(btn).setAlpha(0.0F);
-            this.buttons.get(btn).visible = false;
-            this.buttons.get(btn).setWidth(0);
+        for(int b=1; b <= 3; b++)
+        {
+            ItemWidget btn = (ItemWidget) buttons.get(b);
+            btn.hideWidget();
         }
     }
 
@@ -228,8 +258,43 @@ public class CustomizationScreen extends Screen  {
         }
     }
 
-    private void calculatePages() {
 
+    ////// Page functions in GUI
+    private void updatePageDimensions()
+    {
+        if (currentMenuPoint != GuiMenuEnum.MAIN)
+        {
+            menuPointPages.get(currentPage).updateDimensions(this.leftPos,this.topPos);
+        }
+    }
+
+    private void showPage(int pageId)
+    {
+        currentPage = pageId;
+        InfCust.LOGGER.error(currentPage+1 + "/" + menuPointPages.size());
+        nextPageButton = new CustButton(leftPos +115, topPos+170 , (this.width/this.height)*50, 20, new TranslationTextComponent(">"), (p_213030_1_) -> {
+            this.showMainButtons();
+            InfCust.LOGGER.error("NEXT PAGE");
+            this.showPage(currentPage+1);
+        });
+        prevPageButton = new CustButton(leftPos +170, topPos+170 , (this.width/this.height)*50, 20, new TranslationTextComponent("<"), (p_213030_1_) -> {
+            this.showMainButtons();
+            InfCust.LOGGER.error("PREV PAGE");
+        });
+        this.addButton(nextPageButton);
+        this.addButton(prevPageButton);
+        GUIPage currentPage = menuPointPages.get(pageId);
+        //InfCust.LOGGER.error(this.width +  "   "  +this.height);
+        currentPage.initializeWidgets(this.width,this.height);
+        //InfCust.LOGGER.error(this.buttons.size());
+        List<ItemWidget> pageWidgets = currentPage.getPageWidgets();
+        List<GUIPage.GUIPageItem> GUIItems = currentPage.getGUIItems();
+        //pageWidgets.forEach(itemWidget -> {this.buttons.add(itemWidget);});
+        GUIItems.forEach(guiPageItem -> {
+            this.addButton((new ItemWidget(guiPageItem.xPos ,guiPageItem.yPos, 40, 40, new TranslationTextComponent("infcust.testwidget"), 11,11,1 ,GuiMenuEnum.HATS, guiPageItem.custItem, (p_213030_1_) -> {
+                InfCust.LOGGER.error("Maaaan....");
+            })));
+        });
     }
 
     ////// Main GUI functions
@@ -237,49 +302,23 @@ public class CustomizationScreen extends Screen  {
     ////// Hats functions in GUI
 
     private void initHats() {
+        ArrayList<CustItem> itemsToRender = Lists.newArrayList();
+        InfCust.itemsHandler.CustItems.forEach(item -> { if (item.menuPlacement == GuiMenuEnum.HATS) {itemsToRender.add(item);}});
 
-//        InfCust.itemsHandler.CustItems.forEach(item -> { if (item.menuPlacement==GuiMenuEnum.HATS) { addItem(new ItemWidget(leftPos +115, topPos+20 , 40, 40, new TranslationTextComponent("infcust.testwidget"),GuiMenuEnum.HATS ,item,(p_213030_1_) -> {
-//          InfCust.itemsHandler.setCurrentItem(item);}));
-//
-//        }});
+        menuPointPages.clear();
+        //InfCust.LOGGER.error("[TO RENDER SIZE ARRAY] " + itemsToRender.size());
+        List<List<CustItem>> _itemsPages = chunkList(itemsToRender,9);
+        //InfCust.LOGGER.error("[CHUNKS LISTS SIZE] " + _itemsPages.size());
+        _itemsPages.forEach(_itemsPage -> {
+            menuPointPages.add(new GUIPage(_itemsPage,leftPos + 110, topPos + 20));
+        });
 
-        this.addButton(new ItemWidget(leftPos + 110, topPos + 20, 40, 40, new TranslationTextComponent("infcust.testwidget"), GuiMenuEnum.HATS, InfCust.itemsHandler.getItemByIndex(0), (p_213030_1_) -> {
-            InfCust.itemsHandler.setCurrentItem(InfCust.itemsHandler.getItemByIndex(0));
-            InfCust.capabilityUtil.updateCapabilityHatId(0);
-            InfCust.LOGGER.error("updated capa");
-        }));
-
-
-        InfCust.LOGGER.error("INITHATS ");
+        InfCust.LOGGER.error(menuPointPages.size());
+        InfCust.LOGGER.error("INITHATS");
     }
 
-    public void addItem(ItemWidget itemWidget) {
-        this.hatsWidgets.add(itemWidget);
-    }
 
-    public void generateAndRenderPages(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_) {
-
-        // Shit code is my life
-
-
-
-    //    int i =0;
-    //    for(int currentColumn=1; currentColumn<=4; currentColumn= currentColumn+1)
-    //    {
-    //        for(int currentRow=1; currentRow<=2; currentRow= currentRow+1)
-    //        {
-    //            this.hatsWidgets.get(i).x = leftPos + (currentRow*40);
-    //            this.hatsWidgets.get(i).y = leftPos + (currentColumn*40);
-    //            this.hatsWidgets.get(i).render(p_230430_1_,p_230430_2_,p_230430_3_,p_230430_4_);
-    //            i = i +1;
-    //        }
-    //    }
-
-    }
-
-    private void showHatsWidgets() {
-        InfCust.itemsHandler.CustItems.forEach(item -> { if (item.menuPlacement==GuiMenuEnum.HATS) {this.buttons.get(item.getButtonNumber());}});
-    }
+    ////// Hats functions in GUI
 
     private void initHatsScreen() {
         if (currentMenuPoint != GuiMenuEnum.HATS){
@@ -288,9 +327,8 @@ public class CustomizationScreen extends Screen  {
         currentMenuPoint = GuiMenuEnum.HATS;
         setGUIHeaderText(GuiMenuEnum.HATS);
         initHats();
+        showPage(0);
     }
-
-    ////// Hats functions in GUI
 
 
 }
